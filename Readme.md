@@ -6,3 +6,6 @@
 
 - `r` - restart
 - `q` - quit
+- `1` - field size 1
+- `2` - field size 2
+- `3` - field size 3

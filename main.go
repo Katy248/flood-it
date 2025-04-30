@@ -5,7 +5,6 @@ import (
 	"sync"
 	"time"
 
-	gui "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -27,7 +26,7 @@ func main() {
 
 	fontSize := int32(40)
 	for !rl.WindowShouldClose() {
-		if rl.IsKeyDown(rl.KeyQ) {
+		if rl.IsKeyReleased(rl.KeyQ) {
 			break
 		}
 		mousePosition = rl.GetMousePosition()
@@ -46,13 +45,6 @@ func main() {
 			rl.DrawText(
 				"You win!", int32(rl.GetScreenWidth())/2-rl.MeasureText("You win!", 40)/2, int32(rl.GetScreenHeight())/2, fontSize, rl.Red,
 			)
-			if gui.Button(rl.Rectangle{
-				Width: 200, Height: 100,
-				X: float32(rl.GetScreenWidth())/2 - 200/2,
-				Y: float32(rl.GetScreenHeight())/2 - 200,
-			}, "New game") {
-				initField()
-			}
 		}
 		rl.EndDrawing()
 
@@ -114,18 +106,41 @@ func (c *Cell) Draw() {
 	// }
 }
 
-const FieldSize = 12
+const (
+	FieldSize1 = 6
+	FieldSize2 = 12
+	FieldSize3 = 24
+)
+
+var FieldSize = FieldSize2
+
 const CellHeight = 40
 const CellWidth = 40
 
-var FieldWidth = FieldSize * CellWidth
-var FieldHeight = FieldSize * CellHeight
+var FieldWidth int
+var FieldHeight int
 
 func updateField() {
-	if rl.IsKeyDown(rl.KeyR) {
+	var FieldWidth = FieldSize * CellWidth
+	var FieldHeight = FieldSize * CellHeight
+	if rl.IsKeyReleased(rl.KeyR) {
 		initField()
 		return
 	}
+
+	if rl.IsKeyReleased(rl.KeyOne) {
+		FieldSize = FieldSize1
+		initField()
+	}
+	if rl.IsKeyReleased(rl.KeyTwo) {
+		FieldSize = FieldSize2
+		initField()
+	}
+	if rl.IsKeyReleased(rl.KeyThree) {
+		FieldSize = FieldSize3
+		initField()
+	}
+
 	hoveredColor = rl.Blank
 	startPos := rl.Vector2{
 		X: float32(rl.GetScreenWidth())/2 - float32(FieldWidth)/2,
