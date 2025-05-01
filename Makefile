@@ -1,7 +1,7 @@
 NAME = flood-it
 OUTPUT = $(NAME)
 
-.PHONY: build build-win build-all
+.PHONY: build build-win
 
 build:
 	$(GOFLAGS) go build -o ./build/$(OUTPUT)
@@ -9,5 +9,3 @@ build:
 build-win: OUTPUT = $(NAME).exe
 build-win: GOFLAGS += GOOS=windows
 build-win: build
-
-build-all: build build-win
