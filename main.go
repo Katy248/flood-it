@@ -24,7 +24,6 @@ func main() {
 
 	initField()
 
-	fontSize := int32(40)
 	for !rl.WindowShouldClose() {
 		if rl.IsKeyReleased(rl.KeyQ) {
 			break
@@ -32,26 +31,43 @@ func main() {
 		mousePosition = rl.GetMousePosition()
 		updateField()
 		rl.BeginDrawing()
-		rl.ClearBackground(rl.Black)
+		rl.ClearBackground(ColorDark4)
 		drawField()
 		if checkWin() {
 			canPlay = false
-			rl.DrawRectangleRec(rl.Rectangle{
-				X:      float32(int32(rl.GetScreenWidth())/2 - rl.MeasureText("You win!", 40)/2),
-				Y:      float32(rl.GetScreenHeight()) / 2,
-				Width:  float32(rl.MeasureText("You win!", fontSize)),
-				Height: float32(fontSize),
-			}, rl.RayWhite)
-			rl.DrawText(
-				"You win!", int32(rl.GetScreenWidth())/2-rl.MeasureText("You win!", 40)/2, int32(rl.GetScreenHeight())/2, fontSize, rl.Red,
-			)
+			drawOverlayLabel("You win!")
+		} else if checkLoose() {
+			canPlay = false
+			drawOverlayLabel("You lose")
 		}
 		rl.EndDrawing()
 
 	}
 }
 
+const (
+	OverlayLabelFontSize = 40
+	OverlayLabelPadding  = 10
+)
+
+func drawOverlayLabel(text string) {
+	textLength := rl.MeasureText(text, OverlayLabelFontSize)
+	rl.DrawRectangleRec(rl.Rectangle{
+		X:      float32(int32(rl.GetScreenWidth())/2-textLength/2) - OverlayLabelPadding,
+		Y:      float32(rl.GetScreenHeight())/2 - OverlayLabelPadding,
+		Width:  float32(textLength) + OverlayLabelPadding*2,
+		Height: float32(OverlayLabelFontSize) + OverlayLabelPadding*2,
+	}, ColorLight3)
+	rl.DrawText(
+		text,
+		int32(rl.GetScreenWidth())/2-textLength/2, int32(rl.GetScreenHeight())/2,
+		OverlayLabelFontSize,
+		ColorRed,
+	)
+}
+
 func initField() {
+	rl.SetWindowMinSize(FieldSize*CellWidth, FieldSize*CellHeight+CounterFontSize)
 	field = make([][]*Cell, FieldSize)
 	for i := 0; i < FieldSize; i++ {
 		field[i] = make([]*Cell, FieldSize)
@@ -60,7 +76,6 @@ func initField() {
 				Color:     getColor(),
 				Rectangle: &rl.Rectangle{Width: CellWidth, Height: CellHeight},
 			}
-			fmt.Println(field[i][j])
 		}
 	}
 	currentColor = field[0][0].Color
@@ -110,6 +125,10 @@ const (
 	FieldSize1 = 6
 	FieldSize2 = 12
 	FieldSize3 = 24
+
+	MaxCounter1 = 10
+	MaxCounter2 = 22
+	MaxCounter3 = 42
 )
 
 var FieldSize = FieldSize2
@@ -119,6 +138,8 @@ const CellWidth = 40
 
 var FieldWidth int
 var FieldHeight int
+
+const CounterFontSize = 40
 
 func updateField() {
 	var FieldWidth = FieldSize * CellWidth
@@ -146,6 +167,9 @@ func updateField() {
 		X: float32(rl.GetScreenWidth())/2 - float32(FieldWidth)/2,
 		Y: float32(rl.GetScreenHeight())/2 - float32(FieldHeight)/2,
 	}
+	if startPos.Y < CounterFontSize {
+		startPos.Y = CounterFontSize
+	}
 	for i := 0; i < FieldSize; i++ {
 		for j := 0; j < FieldSize; j++ {
 			field[i][j].Update(rl.Vector2{
@@ -167,7 +191,7 @@ func drawField() {
 			}
 		}
 	}
-	rl.DrawText(fmt.Sprintf("Clicks %d", clicksCount), 0, 0, 40, currentColor)
+	rl.DrawText(fmt.Sprintf("Clicks %d/%d", clicksCount, getCurrentMaxClicks()), 0, 0, CounterFontSize, currentColor)
 }
 func updateCurrentColor(newColor rl.Color) {
 	canPlay = false
@@ -184,9 +208,25 @@ func checkWin() bool {
 			}
 		}
 	}
-
 	return true
+}
 
+func checkLoose() bool {
+	maxClicks := getCurrentMaxClicks()
+	return clicksCount >= maxClicks
+}
+
+func getCurrentMaxClicks() int {
+	switch FieldSize {
+	case FieldSize1:
+		return MaxCounter1
+	case FieldSize2:
+		return MaxCounter2
+	case FieldSize3:
+		return MaxCounter3
+	default:
+		return 0
+	}
 }
 
 func updateCellColor(i, j int, newColor rl.Color, goLeft bool, goUp bool) {
@@ -231,16 +271,26 @@ func updateCellColor(i, j int, newColor rl.Color, goLeft bool, goUp bool) {
 		}()
 	}
 	wg.Wait()
-
 }
 
+var (
+	ColorRed    = rl.Color{224, 27, 36, 255}
+	ColorOrange = rl.Color{255, 120, 0, 255}
+	ColorYellow = rl.Color{246, 211, 45, 255}
+	ColorGreen  = rl.Color{51, 209, 122, 255}
+	ColorBlue   = rl.Color{53, 132, 228, 255}
+	ColorPurple = rl.Color{145, 65, 172, 255}
+
+	ColorLight3 = rl.Color{222, 221, 218, 255}
+	ColorDark4  = rl.Color{36, 31, 49, 255}
+)
 var colors = []rl.Color{
-	rl.Red,
-	rl.Yellow,
-	rl.Orange,
-	rl.Green,
-	rl.Blue,
-	rl.Violet,
+	ColorRed,
+	ColorOrange,
+	ColorYellow,
+	ColorGreen,
+	ColorBlue,
+	ColorPurple,
 }
 
 func getColor() rl.Color {

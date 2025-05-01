@@ -2,6 +2,8 @@
 
 ![](https://img.shields.io/github/go-mod/go-version/katy248/flood-it)
 
+![](./screenshots/image.png)
+
 ## Controls
 
 - `r` - restart
