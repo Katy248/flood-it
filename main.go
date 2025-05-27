@@ -47,14 +47,14 @@ func main() {
 		field.Update()
 		rl.BeginDrawing()
 		{
-			rl.ClearBackground(ColorDark4)
+			rl.ClearBackground(ColorWindowBG)
 			field.Draw()
 			if checkWin(field) {
 				field.CanPlay = false
-				drawOverlayLabel("You win!")
+				drawOverlayLabel("You win!", ColorWindowBG, ColorErrorFG)
 			} else if checkLoose(field) {
 				field.CanPlay = false
-				drawOverlayLabel("You lose")
+				drawOverlayLabel("You lose", ColorErrorBG, ColorErrorFG)
 			}
 		}
 		rl.EndDrawing()
@@ -67,19 +67,19 @@ const (
 	OverlayLabelPadding  = 10
 )
 
-func drawOverlayLabel(text string) {
+func drawOverlayLabel(text string, bg rl.Color, fg rl.Color) {
 	textLength := rl.MeasureText(text, OverlayLabelFontSize)
 	rl.DrawRectangleRec(rl.Rectangle{
 		X:      float32(int32(rl.GetScreenWidth())/2-textLength/2) - OverlayLabelPadding,
 		Y:      float32(rl.GetScreenHeight())/2 - OverlayLabelPadding,
 		Width:  float32(textLength) + OverlayLabelPadding*2,
 		Height: float32(OverlayLabelFontSize) + OverlayLabelPadding*2,
-	}, ColorLight3)
+	}, bg)
 	rl.DrawText(
 		text,
 		int32(rl.GetScreenWidth())/2-textLength/2, int32(rl.GetScreenHeight())/2,
 		OverlayLabelFontSize,
-		ColorRed,
+		fg,
 	)
 }
 
@@ -127,8 +127,10 @@ var (
 	ColorBlue   = rl.Color{53, 132, 228, 255}
 	ColorPurple = rl.Color{145, 65, 172, 255}
 
-	ColorLight3 = rl.Color{222, 221, 218, 255}
-	ColorDark4  = rl.Color{36, 31, 49, 255}
+	ColorWindowFG = rl.NewColor(255, 255, 255, 255)
+	ColorWindowBG = rl.NewColor(34, 34, 38, 255) // rl.Color{36, 31, 49, 255}
+	ColorErrorBG  = rl.NewColor(192, 28, 40, 255)
+	ColorErrorFG  = rl.NewColor(255, 255, 255, 255)
 )
 var colors = []rl.Color{
 	ColorRed,
